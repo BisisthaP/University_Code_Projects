@@ -14,26 +14,29 @@ def wrap(pos):
 
 def move_clockwise(x, y):
     #clockwise order around the border (top → right → bottom → left)
-    if y == 0 and x < grid_size - 1:
+    if y == 0 and x < grid_size - 1: #top 
         x += 1
-    elif x == grid_size - 1 and y < grid_size - 1:
+    elif x == grid_size - 1 and y < grid_size - 1: #right 
         y += 1
-    elif y == grid_size - 1 and x > 0:
+    elif y == grid_size - 1 and x > 0: #bottom
         x -= 1
-    elif x == 0 and y > 0:
+    elif x == 0 and y > 0: #left
         y -= 1
     return wrap(x), wrap(y)
 
 def move_diagonal_ccw(x, y):
     # Moves diagonally in a diamond shape (counter-clockwise)
     moves = [(-1, -1), (-1, 1), (1, 1), (1, -1)] #such list indexes start from 0 
-    index = (x + y) % 4 #remainder 
+    index = (x + y) % 4 #remainder when divided by 4
+     #index will change the values through 0,1,2,3 as the agent moves diagonally
     dx, dy = moves[index]
     return wrap(x + dx), wrap(y + dy)
 
 def move_left(x, y):
     # Always moves left
     return wrap(x - 1), y
+    #x = move left or right 
+    #y = move up or down
 
 class Agent:
     def __init__(self, name, pos, move_func, start_delay=0):
@@ -48,10 +51,11 @@ class Agent:
         if self.step < self.delay: #2<2 = false 
             self.step += 1
             return tuple(self.pos) 
+        #calculation of new position using the movement function
         new_x, new_y = self.move_func(*self.pos)
-        self.pos = np.array([new_x, new_y])
+        self.pos = np.array([new_x, new_y]) #update position
         self.step += 1
-        return tuple(self.pos)
+        return tuple(self.pos) #return as a tuple 
 
 
 agents = [
@@ -62,8 +66,8 @@ agents = [
 #all agents start at (0,1) which is the co-ordinates for S 
 
 for t in range(time_steps):
-    print(f"\n Time Step {t + 1}")
-    grid = [["." for _ in range(grid_size)] for _ in range(grid_size)] 
+    print(f"Time Step {t + 1}")
+    grid = [[ "." ] * grid_size for _ in range(grid_size)]
     #empty grid initialised with . 
     occupied = {}  # track where agents move - empty dictionaries 
 
@@ -90,4 +94,6 @@ for t in range(time_steps):
     for row in grid:
         print(" ".join(row))
 
-print("\nSimulation complete. Observe repeating patterns or stable conflicts.")
+print("Simulation complete. Observe repeating patterns or stable conflicts.")
+#pattern recognised after several time steps 
+
