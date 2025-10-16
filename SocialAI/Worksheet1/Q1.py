@@ -96,4 +96,18 @@ for t in range(time_steps):
 
 print("Simulation complete. Observe repeating patterns or stable conflicts.")
 #pattern recognised after several time steps 
+#A 4 Step repeat cycle that becomes obvious after time step 22 (from t = 23)
+
+#there two main conflict patterns - 
+#one conflict between A1 and A2 at (2,2) (Happens at t=23, 27, 31, 35, etc.)
+#another conflict between A2 and A3 at (1,1) (Happens at t=25, 29, 33, 37, etc.)
+#also notice that every time there is a conflict, agents are always place one below the another on the same side
+#and one of the agent is off the grid 
+#e.g. (2,2) - A1 is at (2,2), A2 is at (2,1) and A3 is off the grid
+
+#reason for the conflict is that the agents are trying to move into the same cell at the same time step
+#as in, during the conflict situations, both agents move back to their previous positions
+#and try to move into the same cell again in the next time step, causing a repeating conflict cycle 
+
+#endo of question 1 
 

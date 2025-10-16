@@ -1,4 +1,5 @@
 import numpy as np
+import random 
 
 GRID_SIZE = 5
 TIME_STEPS = 100
@@ -18,7 +19,7 @@ def move_horizontal_cycle(x, y):
     return x + 1, y
 
 def move_random(x, y):
-    dx, dy = np.random.choice([(-1, 0), (1, 0), (0, -1), (0, 1)]) 
+    dx, dy = random.choice([(-1, 0), (1, 0), (0, -1), (0, 1)])
     #move right = (1,0)
     #move left = (-1,0)
     #move up = (0,-1)
@@ -171,5 +172,20 @@ for i in range(1, NUM_SCENARIOS + 1):
 print("--- Summary of Results ---")
 for scenario, count in results.items():
     print(f"{scenario}: {count} agents remaining")
+
+#agents remaining after 100 steps: Scenario 1: 2,
+# Scenario 2: 1, 
+# Scenario 3: 3
+
+#why ?
+#The random (A4) and down-right (A2) movers are often the first to be lost, 
+# frequently falling off the boundary for scenario 1
+
+#The agents start close together, leading to early pushing and 
+# a brief period of instability before A1 (Up) quickly moves out of the crowd's path for scenarion 2
+
+#For scenario 3, the configuration provided enough space that all agents survived the 100 steps. 
+#No death causing pushes or boundary exits occurred within the time limit.
+
 
 
