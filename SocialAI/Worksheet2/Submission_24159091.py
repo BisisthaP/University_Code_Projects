@@ -108,4 +108,38 @@ def cal_delta(alpha, gradient):
 def threshold_check(gradient, threshold):
     return abs(gradient) < threshold
 
+#part 5 
+def gradient_descent(x_init, alpha, theta, max_iters):
+
+    #x_init = starting point 
+    #alpha = learning rate
+    #theta = threshold for gradient check
+    x = x_init
+    iterations = 0 
+
+    while iterations < max_iters: 
+        #loop will run until iterations = 1000 or gradient check is satisfied - minimum gradient is reached 
+
+        #calculation of the current values of y and gradient
+        curr_val = function(x)
+        gradient = derivative(x)
+
+        print(f"Iteration {iterations}: x = {x:.6f}, f(x) = {curr_val:.6f}, f'(x) = {gradient:.6f}")
+
+        if threshold_check(gradient, theta):
+            print(f"Converged after {iterations} iterations!")
+            print(f"Minimum found at x = {x:.6f}, f(x) = {curr_val:.6f}")
+            return x, curr_val, iterations
+        
+        #update x value using the calculated delta
+        delta = cal_delta(alpha, gradient)
+        x += delta
+
+        iterations += 1
+    
+    #if max iterations reached without convergence
+    final_value = function(x)
+    print(f"Reached maximum iterations ({max_iters})")
+    print(f"Final result: x = {x:.6f}, f(x) = {final_value:.6f}")
+    return x, final_value, iterations
 
