@@ -143,3 +143,15 @@ def gradient_descent(x_init, alpha, theta, max_iters):
     print(f"Final result: x = {x:.6f}, f(x) = {final_value:.6f}")
     return x, final_value, iterations
 
+# Set the parameters
+print("\nTest 1: Starting from x = 2")
+result_x, result_fx, iters = gradient_descent(x_init=2, alpha=0.1, theta=0.001, max_iters=1000)
+    
+#Test case 2: Start from x = -3
+print("\nTest 2: Starting from x = -3")
+result_x2, result_fx2, iters2 = gradient_descent(x_init=-3, alpha=0.1, theta=0.001, max_iters=1000)
+    
+# Test case 3: Smaller learning rate
+print("\nTest 3: Smaller learning rate (alpha=0.01)")
+result_x3, result_fx3, iters3 = gradient_descent(x_init=2,alpha=0.01, theta=0.001, max_iters=1000)
+
