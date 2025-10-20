@@ -67,6 +67,28 @@ def simulate(chg,rate):
             for j in range(9):
                 print(f"  Follower {j+1}: ({followers[j].x:.2f}, {followers[j].y:.2f})")
 
+    print("")
+    print("Simulation is complete")
+    print(f"Final Leader Position: ({leader.x:.2f}, {leader.y:.2f})")
+    for j in range(9):
+        print(f"  Follower {j+1} Final positions:  ({followers[j].x:.2f}, {followers[j].y:.2f})")
+    
+    print("")
+    print("Most distant follower from the leader:")
+    max_dist = -1 
+    for j in range(9):
+        follower = followers[j]
+        dist = distance(leader, follower)
+        if dist > max_dist:
+            max_dist = dist 
+            agent_num = j + 1
+
+    print(f"Follower {agent_num} and leader have the max distance of {max_dist:.4f}")
+
+#main code running and testing
+chg = 2.0 #max change in leader velocity
+rate = 0.05 #learning rate for followers
+simulate(chg, rate)
 
 
 
