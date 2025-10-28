@@ -158,11 +158,17 @@ non_bayesian_counts, _ = simulation(NonBayesianHunter)
 
 plot_comparison(bayesian_counts, non_bayesian_counts, total_turns, treasure_loc)
 
+#When the treasure hunters use Bayesian Update, they learn from empty spots they search 
+# themselves. In the code, the BayesianHunter class calls updateEmptyLocation() when a location is 
+# empty, which sets that spot’s probability to 0 and spreads the remaining probability to the other 
+# locations. So every time they search a wrong spot, they rule it out forever. 
+# Over many turns, all wrong locations get searched at least once and their probabilities 
+# drop to zero, so the only spot left with any chance is the real treasure (location 1). 
+# That’s why the red bar at location 1 is high (~0.182) and the blue bars are almost flat 
+# at ~0.091 — the agent keeps going back to the only possible spot left.
 
-
-#The simulation with belief updates results in a higher probability of visiting the treasure location 
-#(~0.18) compared to the empty locations (~0.09), showing the effectiveness of the strategy.
-#The simulation without belief updates results in a uniform probability (~0.10) for all locations, 
-#as the agent is essentially choosing randomly every turn and ignoring search results.
-#The comparison clearly demonstrates that updating beliefs (even simplistically) significantly 
-#improves the agent's expected success rate over a purely random search.
+#Without Bayesian Update, the NonBayesianHunter class has updateEmptyLocation() that does nothing 
+# — it doesn’t learn from empty spots. So even after searching a location and finding nothing, the 
+# probabilities stay the same (all 0.1). Every turn, wheretogo() just picks randomly from all 10 
+# spots because they’re all tied. That’s why all bars are almost exactly 0.100 — it’s pure random 
+# guessing with no learning.
