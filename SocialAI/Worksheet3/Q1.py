@@ -101,3 +101,12 @@ def plot_visit_counts(visit_counts, true_loc):
 
 # Plot the results
 plot_visit_counts(visit_counts, true_loc)
+
+#Observations - 
+#From the figure, the observer can identify the true location of the 
+# treasure as it is visited the most number of times (highlighted in red). 
+# The agent's strategy of updating beliefs based on empty locations
+# guides it towards the treasure over multiple simulations. 
+# if we choose to not use the random choice for tied locations, then the graph/chart will be 
+# skewed towards the location that contains the treasure while the remaining locations before it will have 1 visit 
+# and the remaining locations after it will have 0 visits.
