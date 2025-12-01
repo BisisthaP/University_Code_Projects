@@ -271,3 +271,5 @@
 # plt.tight_layout()
 # plt.show()
 #end of q2
+
+#check the pdf file attached for answers to the theoretical questions + plots
