@@ -2,6 +2,7 @@
 #Student ID - 24159091
 #Name - Bisistha Patra 
 
+#Question 1 -
 # import matplotlib.pyplot as plt
 # import random
 # import copy
@@ -115,3 +116,11 @@
 # plt.title("Simple Grid World Model: Spatially Constrained Growth")
 # plt.legend()
 # plt.show()
+#end of q1 
+
+#Question 2 - 
+# import matplotlib.pyplot as plt
+# import numpy as np
+# import random
+# import copy
+# from scipy.integrate import odeint
