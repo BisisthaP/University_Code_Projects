@@ -65,7 +65,7 @@ def move_prey(prey, pred):
     sensed = sense_pos(prey, pred, dirs) #defined above 
     deltas = get_deltas(1) #prey can move 1 step - including diagoonals 
     if not sensed: #if no predators are sensed - list is empty 
-        deltas = random.choice(deltas) #random movement for preys (defined in task 1)
+        delta = random.choice(deltas) #random movement for preys (defined in task 1)
     else: #predator (atleast 1) is sensed
         best_d = [] #empty list to store the best move 
         max_min_d = -1 #stores the highest min distance from any predator
@@ -85,12 +85,13 @@ def move_prey(prey, pred):
 
 
 #logic similar to prey movement but chase instead of escape strategy
-def move_pred(pred, prey):    
+def move_pred(pred, prey):  
+    global preds  
     dirs = [(0,1), (1,0), (0,-1), (-1,0)] #sense in all directions + diagonals 
     sensed = sense_pos(pred, prey, dirs) #defined above 
     deltas = get_deltas(2) #predator can move 2 steps - including diagoonals 
     if not sensed: #if no preys are sensed - list is empty 
-        dx, dy = random.choice(deltas) #random movement for predators (defined in task 1)
+        delta = random.choice(deltas) #random movement for predators (defined in task 1)
     else: #prey (atleast 1) is sensed
         #logic that is different from prey movement - predator targets the closest prey
         dists = [dist(pred.x, pred.y, sx, sy) for sx, sy in sensed]
@@ -122,11 +123,11 @@ def move_pred(pred, prey):
     if at_pos:
         eaten = random.choice(at_pos) #randomly choose one prey to eat if multiple are on the same cell
         prey.remove(eaten) #remove the eaten prey from the prey list
-        pred.energy += 12 #increase predator energy by 12 (task 1 deined)
+        pred.energy += 5 #increase predator energy by 5 (task 1 deined)
     
     #die if energy <= 0
     if pred.energy <= 0:
-        pred.remove(pred) #indicates predator has died
+        preds.remove(pred) #indicates predator has died
 
 #using one fucntion for both prey and predator reproduction - only difference is the conditions (if statements)
 def reproduce(animal, agents, is_prey):
@@ -216,10 +217,6 @@ if __name__ == "__main__":
             plt.savefig(f'plot_set{s_idx}_run{r_idx}.png')  # Save for report
             plt.close()  #avoid overlap
 
-    
-
-
-
-
+#end of code - correctly working :) 
 
 
