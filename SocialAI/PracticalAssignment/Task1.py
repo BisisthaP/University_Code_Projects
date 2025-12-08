@@ -65,12 +65,12 @@ def move_prey(prey, pred):
     sensed = sense_pos(prey, pred, dirs) #defined above 
     deltas = get_deltas(1) #prey can move 1 step - including diagoonals 
     if not sensed: #if no predators are sensed - list is empty 
-        dx, dy = random.choice(deltas) #random movement for preys (defined in task 1)
+        deltas = random.choice(deltas) #random movement for preys (defined in task 1)
     else: #predator (atleast 1) is sensed
         best_d = [] #empty list to store the best move 
         max_min_d = -1 #stores the highest min distance from any predator
         for d in deltas: #loops through the 8 possible movements
-            nx = (prey.y + d[0]) % grid_size #calculates new x position if the current direction = d is choosen
+            nx = (prey.x + d[0]) % grid_size #calculates new x position if the current direction = d is choosen
             ny = (prey.y + d[1]) % grid_size 
             min_d = min([dist(nx, ny, sx, sy) for sx, sy in sensed])
             if min_d > max_min_d: #current move better than best move so far - escape strategy
@@ -156,7 +156,7 @@ def setup(prey_count, pred_count):
                 else:
                     preds.append(Predator(x, y, 5)) #initial predator placement with energy 5
                 break
-        return preys, preds
+    return preys, preds
 
 def run_stimulation(steps, run_id, prey_start, pred_start):
     global preys, preds
