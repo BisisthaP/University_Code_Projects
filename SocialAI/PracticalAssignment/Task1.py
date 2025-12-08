@@ -3,12 +3,14 @@
 
 import random
 import csv 
+import matplotlib.pyplot as plt
 
 #WORLD 
 #for task1, I choose the world to wrap around - this will avoid edge cases (like going out of bounds) 
 #and maintain a uniform stimulation 
 
 grid_size = 50 #given in the task 
+MAX_STEPS = 1000 #maximum steps for the simulation
 
 #common class for both Prey and Predator (base class)
 class Animal:
@@ -139,8 +141,82 @@ def reproduce(animal, agents, is_prey):
         if animal.energy >= 12: 
             agents.append(Predator(nx, ny, 5)) #new predator with initial energy of 5
 
+def setup(prey_count, pred_count):
+    occupied = set() #to avoid placing multiple animals on the same cell initially
+    preys = []
+    preds = []
+    for _ in range(prey_count + pred_count):
+        while True:
+            x = random.randint(0, grid_size - 1)
+            y = random.randint(0, grid_size - 1)
+            if (x,y) not in occupied:
+                occupied.add((x,y))
+                if len(preys) < prey_count:
+                    preys.append(Prey(x, y))#initial prey placement
+                else:
+                    preds.append(Predator(x, y, 5)) #initial predator placement with energy 5
+                break
+        return preys, preds
 
+def run_stimulation(steps, run_id, prey_start, pred_start):
+    global preys, preds
+    preys, preds = setup(prey_start, pred_start)
+    fn = f'sim_set{steps}_run{run_id}.csv'
+    with open(fn, 'w', newline='') as f:
+        w = csv.writer(f)
+        w.writerow(['step', 'prey_count', 'predator_count'])
+        w.writerow([0, len(preys), len(preds)])
+        for step in range(1, MAX_STEPS + 1):
+            #movement phase
+            for prey in preys:
+                move_prey(prey, preds)
+            for pred in preds[:]: #copy of the list to avoid modification during iteration
+                move_pred(pred, preys)
+            
+            #reproduction phase
+            for prey in preys[:]: 
+                reproduce(prey, preys, True)
+            for pred in preds[:]: 
+                reproduce(pred, preds, False) 
+            
+            #write the counts to the csv file
+            w.writerow([step, len(preys), len(preds)])
+            if not preys or not preds:
+                break #end simulation if either preys or predators are extinct - 0 count
 
+if __name__ == "__main__":
+    pops = [(200, 20), (100, 40)]  # Choices explained in report
+    for s_idx, (prey_s, pred_s) in enumerate(pops, 1):
+        for r_idx in range(1, 4):
+            run_stimulation(s_idx, r_idx, prey_s, pred_s)
+    
+    # Plotting section
+    for s_idx in range(1, 3):
+        for r_idx in range(1, 4):
+            fn = f'sim_set{s_idx}_run{r_idx}.csv'
+            read_file = open(fn)
+            csv_reader = csv.reader(read_file)
+            next(csv_reader)  #skip header
+            step_list = []
+            prey_list = []
+            pred_list = []
+            for row in csv_reader:
+                step_list.append(int(row[0]))
+                prey_list.append(int(row[1]))
+                pred_list.append(int(row[2]))
+            read_file.close()
+            
+            # Plot similar to prof's example - provided in the assignment files 
+            combined_list = prey_list + pred_list
+            only_figure, (left_subplot, right_subplot) = plt.subplots(1, 2, figsize=(8, 4))
+            left_subplot.plot(combined_list, linestyle='--')
+            right_subplot.scatter(step_list, prey_list, color='blue', marker='^', label='Prey')
+            right_subplot.scatter(step_list, pred_list, color='red', marker='*', label='Predator')
+            right_subplot.legend()
+            plt.savefig(f'plot_set{s_idx}_run{r_idx}.png')  # Save for report
+            plt.close()  #avoid overlap
+
+    
 
 
 
