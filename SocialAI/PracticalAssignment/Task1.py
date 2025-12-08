@@ -61,24 +61,84 @@ def get_deltas(max):
 def move_prey(prey, pred):
     dirs = [(0,1), (1,0), (0,-1), (-1,0)] #prey can only sense in 4 directions
     sensed = sense_pos(prey, pred, dirs) #defined above 
-    deltas = get_deltas(1) #prey can move 1 step
-    if not sensed: #if no predators are sensed 
+    deltas = get_deltas(1) #prey can move 1 step - including diagoonals 
+    if not sensed: #if no predators are sensed - list is empty 
         dx, dy = random.choice(deltas) #random movement for preys (defined in task 1)
-    else:
-        best_d = []
-        max_min_d = -1 
-        for d in deltas:
-            nx = (prey.y + d[0]) % grid_size
-            ny = (prey.y + d[1]) % grid_size
+    else: #predator (atleast 1) is sensed
+        best_d = [] #empty list to store the best move 
+        max_min_d = -1 #stores the highest min distance from any predator
+        for d in deltas: #loops through the 8 possible movements
+            nx = (prey.y + d[0]) % grid_size #calculates new x position if the current direction = d is choosen
+            ny = (prey.y + d[1]) % grid_size 
             min_d = min([dist(nx, ny, sx, sy) for sx, sy in sensed])
-            if min_d > max_min_d:
-                max_min_d = min_d
+            if min_d > max_min_d: #current move better than best move so far - escape strategy
+                max_min_d = min_d #replace and update 
                 best_d = [d]
-            elif min_d == max_min_d:
+            elif min_d == max_min_d: #current move = same as best move so far - add to list best_d 
                 best_d.append(d)
-        delta = random.choice(best_d)
+        delta = random.choice(best_d) #best is choosen randomly from the list of best moves 
+
     prey.x = (prey.x + delta[0]) % grid_size
-    prey.y = (prey.y + delta[1]) % grid_size
+    prey.y = (prey.y + delta[1]) % grid_size #new position after movement for the prey 
+
+
+#logic similar to prey movement but chase instead of escape strategy
+def move_pred(pred, prey):    
+    dirs = [(0,1), (1,0), (0,-1), (-1,0)] #sense in all directions + diagonals 
+    sensed = sense_pos(pred, prey, dirs) #defined above 
+    deltas = get_deltas(2) #predator can move 2 steps - including diagoonals 
+    if not sensed: #if no preys are sensed - list is empty 
+        dx, dy = random.choice(deltas) #random movement for predators (defined in task 1)
+    else: #prey (atleast 1) is sensed
+        #logic that is different from prey movement - predator targets the closest prey
+        dists = [dist(pred.x, pred.y, sx, sy) for sx, sy in sensed]
+        min_d = min(dists)
+        closest = [i for i, d in zip(sensed, dists) if d == min_d]
+        target = random.choice(closest) 
+        #randomly choose one of the closest preys if multiple are at same distance
+
+        best_d = [] #empty list to store the best move 
+        min_after = float('inf') #stores the lowest min distance from any prey
+        for d in deltas: #loops through the 16 possible movements
+            nx = (pred.x + d[0]) % grid_size #calculates new x position if the current direction = d is choosen
+            ny = (pred.y + d[1]) % grid_size 
+            after = dist(nx, ny, target[0], target[1])
+            if after < min_after: #current move better than best move so far - chase strategy
+                min_after = after #replace and update 
+                best_d = [d]
+            elif after == min_after: #current move = same as best move so far - add to list best_d 
+                best_d.append(d)
+        delta = random.choice(best_d) #best is choosen randomly from the list of best moves 
+
+    cost = max(abs(delta[0]), abs(delta[1])) #energy cost of movement = max step size taken
+    pred.x = (pred.x + delta[0]) % grid_size
+    pred.y = (pred.y + delta[1]) % grid_size #new position after movement for the predator
+    pred.energy -= cost #reduce energy by cost of movement (defined in task 1)
+
+    #eating prey if on the same cell 
+    at_pos = [p for p in prey if p.x == pred.x and p.y == pred.y]
+    if at_pos:
+        eaten = random.choice(at_pos) #randomly choose one prey to eat if multiple are on the same cell
+        prey.remove(eaten) #remove the eaten prey from the prey list
+        pred.energy += 12 #increase predator energy by 12 (task 1 deined)
+    
+    #die if energy <= 0
+    if pred.energy <= 0:
+        pred.remove(pred) #indicates predator has died
+
+#using one fucntion for both prey and predator reproduction - only difference is the conditions (if statements)
+def reproduce(animal, agents, is_prey):
+    deltas = get_deltas(1) #both prey and predator reproduce to adjacent cells only
+    delta = random.choice(deltas) #randomly choose a direction to reproduce
+    nx = (animal.x + delta[0]) % grid_size
+    ny = (animal.y + delta[1]) % grid_size #new position for the child
+    if is_prey:
+        if random.random() < 0.15: #15% chance of reproduction for prey
+            agents.append(Prey(nx, ny)) #new prey
+    else:
+        if animal.energy >= 12: 
+            agents.append(Predator(nx, ny, 5)) #new predator with initial energy of 5
+
 
 
 
