@@ -60,7 +60,6 @@ print(table)
 
 #hence, for the dataset to have even representation of both classes and the fact that the size is more than 200k,
 #we can consider undersampling from the rating 6 to 10, to match the count of the ratings 1 to 5
-
 #creating another column called rating for categorizing the labels of rating into 0 and 1 (for Naive Bayes)
 #1 to 5 = 0 
 #6 to 7 = 1 
@@ -80,3 +79,45 @@ df_balanced = pd.concat([minority, maj_downsized])
 #shuffling the dataset for better model training 
 df_balanced = df_balanced.sample(frac=1, random_state=42).reset_index(drop=True)
 df_balanced
+
+import re 
+import html 
+import nltk 
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer 
+
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('punkt_tab')
+def preprocessing(text):
+  text = html.unescape(text)
+  #used to fix the html parts in the reviews like &#039 
+
+  text = text.strip('"') #removing quotes from the reviews 
+
+  #converting to lowercase
+  text = text.lower()
+
+  #removing numbers and special characters (keeping only letters) 
+  #numbers like 400mg and punctuations 
+  #also removes anything after the apostropes 
+  text = re.sub(r'[^a-z\s]', '', text)
+
+  #splitting into words - tokenise the reviews 
+  tokens = nltk.word_tokenize(text)
+
+  #removing stopwords, lemmatizing  
+  stop_words = set(stopwords.words('english'))
+  lemm = WordNetLemmatizer()
+  tokens = [word for word in tokens if word not in stop_words]
+  tokens = [lemm.lemmatize(word) for word in tokens]
+
+  #joining the reviews into one single string 
+  return " ".join(tokens)
+
+  #lemmatization was used as for medical terms, like medicine and doctor, 
+  #stemming might crop them into medicin and doct 
+
+#applying the preprocessing and checking the cleaned reviews
+df_balanced['clean_review'] = df_balanced['review'].apply(preprocessing)
+print(df_balanced[['review', 'clean_review']].head())
