@@ -121,3 +121,28 @@ def preprocessing(text):
 #applying the preprocessing and checking the cleaned reviews
 df_balanced['clean_review'] = df_balanced['review'].apply(preprocessing)
 print(df_balanced[['review', 'clean_review']].head())
+
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer
+
+df_balanced["clean_review"] = df_balanced["clean_review"].fillna('')
+#handling any empty strings created during preprocessing 
+
+#target and independent features defined below -
+X = df_balanced["clean_review"]
+y = df_balanced["label"]
+
+#splitting the balanced dataset into training and testing before using the count vectorizer 
+#80:20 splits as mentioned in assignment file 
+X_train_raw, X_test_raw, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+#using count vectorizer instead of TF-IDF as we need to implement Naive Bayes from sctrach and 
+#it makes more sense to apply probability, laplacian smoothing to the actual freq/count of words 
+vectorizer = CountVectorizer(max_features=5000)
+
+X_train_counts = vectorizer.fit_transform(X_train_raw)
+X_test_counts = vectorizer.transform(X_test_raw)
+
+#converting to array for easier math 
+X_train_arr = X_train_counts.toarray()
+X_test_arr = X_test_counts.toarray()
