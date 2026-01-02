@@ -146,3 +146,62 @@ X_test_counts = vectorizer.transform(X_test_raw)
 #converting to array for easier math 
 X_train_arr = X_train_counts.toarray()
 X_test_arr = X_test_counts.toarray()
+
+import numpy as np
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
+
+#from sctrach implementation of the model 
+class NaiveBayesScratch:
+    def __init__(self, alpha=1.0):
+        self.alpha = alpha  # Smoothing parameter
+
+    def fit(self, X, y):
+      #matching sizes and finding unique classes 
+        n_samples, n_features = X.shape
+        self.classes = np.unique(y)
+        n_classes = len(self.classes)
+
+        #initialising priors and likelihoods
+        self.priors = np.zeros(n_classes)
+        self.likelihoods = np.zeros((n_classes, n_features))
+
+        for idx, c in enumerate(self.classes):
+            #selecting only those rows for the current class
+            X_c = X[y == c]
+            
+            #there are three main steps for the from scratch implementation -
+            # 1. Prior Calculation: P(Class)
+            self.priors[idx] = X_c.shape[0] / n_samples
+            
+            # 2. Laplacian Smoothing for Likelihoods: P(Word | Class)
+            # Formula: (Count of Word in Class + Alpha) / (Total Words in Class + Alpha * Vocab Size)
+            total_count_words_in_class = np.sum(X_c)
+            word_counts_in_class = np.sum(X_c, axis=0)
+            
+            self.likelihoods[idx, :] = (word_counts_in_class + self.alpha) / \
+                                       (total_count_words_in_class + self.alpha * n_features)
+
+    def predict(self, X):
+        # 3. Log-likelihood calculation to prevent underflow
+        # Log(P(Class|Words)) = Log(P(Class)) + Sum(Word_Count * Log(P(Word|Class)))
+        log_priors = np.log(self.priors)
+        log_likelihoods = np.log(self.likelihoods)
+        
+        #calculating scores for all test samples
+        #for speeding the process, used matrix multiplicatiom 
+        scores = X @ log_likelihoods.T + log_priors
+
+        #could also be done as calculating the total wieght of each words in a class and  
+        #adding that to the staring probability of the class
+        return self.classes[np.argmax(scores, axis=1)]
+
+#model initialising
+nb_scratch = NaiveBayesScratch(alpha=1.0)
+
+#training the model using the arrays 
+print("Training Naive Bayes from scratch...")
+nb_scratch.fit(X_train_arr, y_train.values)
+
+# Predict on the unseen test set
+print("Generating predictions...")
+y_pred = nb_scratch.predict(X_test_arr)
