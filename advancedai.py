@@ -205,3 +205,32 @@ nb_scratch.fit(X_train_arr, y_train.values)
 # Predict on the unseen test set
 print("Generating predictions...")
 y_pred = nb_scratch.predict(X_test_arr)
+
+#calculating the quantitative metrics
+accuracy = round(accuracy_score(y_test, y_pred), 4)
+precision = round(precision_score(y_test, y_pred), 4)
+recall = round(recall_score(y_test, y_pred), 4)
+f1 = round(f1_score(y_test, y_pred), 4)
+report = classification_report(y_test, y_pred, target_names=['Negative (0)', 'Positive (1)'])
+
+#Quantitative Assessment
+print("Model Evaluation Results", "")
+print("Accuracy:", accuracy)
+print("Precision:", precision)
+print("Recall:", recall)
+print("F1-Score:", f1)
+
+# Detailed Classification Report
+print("Detailed Classification Report:", report)
+
+# Confusion Matrix Plot
+cm = confusion_matrix(y_test, y_pred)
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Purples', 
+            xticklabels=['Negative', 'Positive'], 
+            yticklabels=['Negative', 'Positive'])
+
+plt.title('Confusion Matrix: Naive Bayes (From Scratch)')
+plt.ylabel('Actual Label')
+plt.xlabel('Predicted Label')
+plt.show()
