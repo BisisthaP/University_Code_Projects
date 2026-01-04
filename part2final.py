@@ -210,3 +210,78 @@ def label_multiclass(rating):
         return "Neutral"
     else:
         return "Positive"
+
+def main_multiclass():
+    print("")
+    print("STARTING ADVANCED TASK: MULTI-CLASS ANALYSIS")
+    print("")
+
+    try:
+        # Loading the dataset (drugLib format) 
+        train = pd.read_csv("/content/drugLibTrain_raw.tsv", sep="\t")
+        test = pd.read_csv("/content/drugLibTest_raw.tsv", sep="\t")
+        df = pd.concat([train, test], ignore_index=True)
+    except FileNotFoundError:
+        print("Error: Files not found!")
+        return
+
+    # Applying labeling and handling missing values
+    df['multi_label'] = df['rating'].apply(label_multiclass)
+    df = df.dropna(subset=['commentsReview']).copy()
+
+    # BALANCING CLASSES:
+    # This prevents the grouping column from being dropped during the apply step.
+    min_size = df['multi_label'].value_counts().min()
+    df_balanced = df.groupby('multi_label').apply(
+        lambda x: x.sample(min_size, random_state=42), 
+        include_groups=False
+    ).reset_index()
+    
+    #renaming the level_0 column back to multi_label if reset_index moved it
+    if 'level_0' in df_balanced.columns:
+        df_balanced.rename(columns={'level_0': 'multi_label'}, inplace=True)
+
+    print(f"Balanced each class to {min_size} samples for fair training.")
+
+    # PREPROCESSING
+    #sing 'commentsReview' as the source text for multi-class 
+    print("Preprocessing text for 3-class analysis...")
+    df_balanced['clean_review'] = df_balanced['commentsReview'].apply(preprocessing)
+
+    #everything from here is same on -
+    #feature and target Selection
+    X = df_balanced['clean_review']
+    y = df_balanced['multi_label']
+
+    # 80/20 Train-Test Split 
+    X_train_raw, X_test_raw, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    #feature Representation 
+    vec = CountVectorizer(max_features=5000)
+    X_train = vec.fit_transform(X_train_raw).toarray()
+    X_test = vec.transform(X_test_raw).toarray()
+
+    #model training: Using the NaiveBayesScratch class from Part 1 
+    nb_multi = NaiveBayesScratch(alpha=1.0)
+    print("Training Multi-Class Model...")
+    nb_multi.fit(X_train, y_train.values)
+
+    # EVALUATION 
+    y_pred = nb_multi.predict(X_test)
+    print("Multi-Class Performance Metrics")
+    print(classification_report(y_test, y_pred))
+
+    #confusion Matrix visualization
+    cm = confusion_matrix(y_test, y_pred, labels=['Negative', 'Neutral', 'Positive'])
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='YlGnBu', 
+                xticklabels=['Negative', 'Neutral', 'Positive'],
+                yticklabels=['Negative', 'Neutral', 'Positive'])
+    plt.title('Confusion Matrix: 3-Class Sentiment')
+    plt.ylabel('Actual Label')
+    plt.xlabel('Predicted Label')
+    plt.show()
+
+#to run 
+main() #for absa 
+main_multiclass() #for multiclass 
