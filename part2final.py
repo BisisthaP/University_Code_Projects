@@ -194,3 +194,19 @@ def main():
     plt.suptitle("Contrastive ABSA Analysis: Risky vs Success Cases", fontsize=20)
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.show()
+
+#ADVANCED TASK: MULTI-CLASS SENTIMENT ANALYSIS (PATHWAY 2)
+#I could not understand if we have to do both the subtasks mentioned in pathway 2 or not - 
+#So i did do both to stay safe 
+def label_multiclass(rating):
+    "Standardizing the 10-point scale into 3 distinct categories"
+    "1-4: Negative (Low satisfaction/Ineffective)"
+    "5-7: Neutral (Moderate results or mixed feelings)"
+    "8-10: Positive (High satisfaction/Highly effective)"
+
+    if rating <= 4:
+        return "Negative"
+    elif rating <= 7:
+        return "Neutral"
+    else:
+        return "Positive"
